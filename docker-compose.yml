@@ -1,0 +1,47 @@
+﻿services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: devmind
+      POSTGRES_USER: devmind
+      POSTGRES_PASSWORD: devmind
+    ports: ["5432:5432"]
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./migrations/001_init.sql:/docker-entrypoint-initdb.d/001_init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U devmind -d devmind"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  backend:
+    build: ./src/backend
+    environment:
+      APP_ENV: development
+      DATABASE_URL: postgresql+asyncpg://devmind:devmind@postgres:5432/devmind
+      REDIS_URL: redis://redis:6379/0
+      CORS_ORIGINS: http://localhost:5173
+    env_file:
+      - path: .env
+        required: false
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    ports: ["8000:8000"]
+  frontend:
+    build:
+      context: ./src/frontend
+      args:
+        VITE_API_BASE_URL: http://localhost:8000
+    depends_on: [backend]
+    ports: ["5173:80"]
+volumes:
+  postgres_data:

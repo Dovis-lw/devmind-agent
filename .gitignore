@@ -1,0 +1,39 @@
+# Secrets and local environment
+.env
+.env.*
+!.env.example
+
+# Operating system and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Common generated output
+build/
+dist/
+coverage/
+.tmp/
+*.log
+
+# Python and frontend caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+node_modules/
+.cache/
+.npm/
+
+# Local databases and credentials
+*.sqlite
+*.sqlite3
+*.db
+*.pem
+*.key
+.pnpm-store/
+
+# Deprecated package-manager metadata
+src/frontend/pnpm-lock.yaml
+src/frontend/pnpm-workspace.yaml
